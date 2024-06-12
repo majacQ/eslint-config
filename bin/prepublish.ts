@@ -2,14 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import parseArgs from 'minimist';
 
-interface IPrepublishArgs {
-    from: string;
-    to: string;
-}
-
 async function run(): Promise<void> {
-    const { from = '.', to = './dist' } = parseArgs<IPrepublishArgs>(process.argv.slice(2));
-    console.log({ from, to });
+    const {
+        from = '.',
+        to = './dist',
+        main = './cjs/index.js',
+        typings = './types/index.d.ts',
+    } = parseArgs<{ from: string; to: string; main: string; typings: string }>(process.argv.slice(2));
+    console.log({ from, to, main, typings });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {

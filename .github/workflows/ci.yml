@@ -2,41 +2,39 @@ name: ci
 
 on:
   push:
-  schedule:
-    # https://crontab.guru/every-day
-    - cron:  '0 9 * * *'
+    branches: [master]
+  pull_request:
+    branches: [master, stage]
 
 jobs:
   commitlint:
     runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
 
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Lints Pull Request commits
-        uses: wagoid/commitlint-github-action@v2
+        uses: wagoid/commitlint-github-action@v5
 
   lint:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v2
-
-      - name: Read node version from `.nvmrc` file
-        id: nvmrc
-        uses: browniebroke/read-nvmrc-action@v1
+      - name: Git Checkout
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ steps.nvmrc.outputs.node_version }}
+          node-version-file: ".nvmrc"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install npm dependencies
-        run: npm install --progress=false --loglevel=warn --ignore-scripts
+        run: npm ci
 
       - name: Build dist
         run: npm run build
